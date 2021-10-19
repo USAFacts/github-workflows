@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 jobs:
   test:
-    uses: usafacts/github-workflows/frontend/shareable-branch.yml@main
+    uses: usafacts/github-workflows/.github/workflows/frontend-library-branch.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
