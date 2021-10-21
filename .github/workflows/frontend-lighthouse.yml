@@ -16,8 +16,10 @@ env:
   LHCI_GITHUB_APP_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   test:
-    runs-on: [self-hosted, frontend]
+    runs-on: ubuntu-20.04
     steps:
+      - name: SetupOS
+        run: snap install chromium
       - name: Checkout
         uses: actions/checkout@v2
         with:
