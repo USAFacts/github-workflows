@@ -36,15 +36,11 @@ jobs:
           npm install -g @lhci/cli@0.8.x
       - name: Lighthouse
         run: |
-          lhci collect \
-            --url ${{ secrets.TEST_URL }} \
-            --outputDir .lighthouse
-            --reportFilenamePattern 'report.${{ secrets.TEST_URL }}.%%EXTENSION%%'
-            --config ./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js
+          lhci collect --url ${{ secrets.TEST_URL }} --outputDir .lighthouse --reportFilenamePattern 'report.${{ secrets.TEST_URL }}.%%EXTENSION%%' --config ./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js
       - name: Display
         run: cat .lighthouse/report.${{ secrets.TEST_URL }}.json
       - name: Results
         run: |
           node -p -e '\
-            const report = JSON.parse(require("fs").readFileSync(".lighthouse/report.${{ secrets.TEST_URL }}.json"));\
+            const report = JSON.parse(require("fs").readFileSync(".lighthouse/report.${{ secrets.TEST_URL }}.json")); \
             console.log(Object.keys(report.categories).reduce((acc,cat) => ({ ...acc, [cat]: report.categories[cat]?.score }), {}));'

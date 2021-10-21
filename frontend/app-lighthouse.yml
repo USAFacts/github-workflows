@@ -1,0 +1,55 @@
+name: lighthouse
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  reports:
+    runs-on: ubuntu-latest
+    outputs:
+      # These should match your filters below
+      covidVaccines: ${{ steps.changes.outputs.covidVaccines }}
+      covidCases: ${{ steps.changes.outputs.covidCases }}
+      climate: ${{ steps.changes.outputs.climate }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+      - name: lense
+        uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          # Add filters in the format of `keyName: path/**`
+          filters: |
+            covidVaccines:
+              - 'src/views/Issues/CovidNineteen/Vaccines/**'
+            covidCases:
+              - 'src/views/Issues/CovidNineteen/CasesAndDeaths/**'
+            climate:
+              - 'src/views/Issues/Climate/**'
+  # Define your lighthouse runs.
+  climate:
+    needs: [reports]
+    if: ${{needs.reports.outputs.climate}} == 'true'
+    uses: usafacts/github-workflows/.github/workflows/frontend-lighthouse.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      TEST_URL: "http://localhost/issues/climate"
+  covid-cases:
+    needs: [reports]
+    if: ${{needs.reports.outputs.covidCases}} == 'true'
+    uses: usafacts/github-workflows/.github/workflows/frontend-lighthouse.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      TEST_URL: "http://localhost/visualizations/coronavirus-covid-19-spread-map"
+  covid-vaccines:
+    needs: [reports]
+    if: ${{needs.reports.outputs.covidVaccines}} == 'true'
+    uses: usafacts/github-workflows/.github/workflows/frontend-lighthouse.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      TEST_URL: "https://localhost/visualizations/covid-vaccine-tracker-states"
