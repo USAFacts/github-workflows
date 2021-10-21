@@ -10,10 +10,11 @@ on:
         required: true
       TEST_URL:
         required: true
+      LH_BUILD_TOKEN:
+        required: true
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-  LHCI_GITHUB_APP_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   test:
     runs-on: ubuntu-20.04
@@ -38,7 +39,11 @@ jobs:
           npm install -g @lhci/cli@0.8.x
       - name: Lighthouse
         run: |
-          lhci collect --url ${{ secrets.TEST_URL }} --outputDir .lighthouse --reportFilenamePattern 'report.${{ secrets.TEST_URL }}.%%EXTENSION%%' --config ./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js
+          lhci autorun \
+            --config=./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js \
+            --collect.url="${{ secrets.TEST_URL }}"" \
+            --upload.githubToken=${{ secrets.GITHUB_TOKEN }} \
+            --upload.token=${{ secrets.LH_BUILD_TOKEN }}
       - name: Display
         run: cat .lighthouse/report.${{ secrets.TEST_URL }}.json
       - name: Results
