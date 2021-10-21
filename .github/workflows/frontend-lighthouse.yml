@@ -1,0 +1,39 @@
+name: branch
+on:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GIT_TOKEN:
+        required: true
+      TEST_URL:
+        required: true
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+  LHCI_GITHUB_APP_TOKEN: ${{ secrets.GIT_TOKEN }}
+jobs:
+  test:
+    runs-on: [self-hosted, frontend]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install
+        run: |
+          npm install --legacy-peer-deps
+          npm install -g @lhci/cli@0.8.x
+      - name: Build
+        run: npm run build
+      - name: Lighthouse
+        run: |
+          lhci collect --url ${{ secrets.TEST_URL }} --config ./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js
