@@ -13,11 +13,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   test:
-    uses: usafacts/github-workflows/.github/workflows/frontend-library-branch.yml@main
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-  release:
     needs: [test]
     runs-on: [self-hosted, frontend]
     steps:
@@ -42,6 +37,8 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install
         run: npm install --legacy-peer-deps
+      - name: Test
+        run: npm run test
       - name: NPM
         run: npm publish
         # We reset and clean the local env because it can contain changes from `npm install` that we don't want.
