@@ -13,7 +13,6 @@ env:
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   test:
-    needs: [test]
     runs-on: [self-hosted, frontend]
     steps:
       - name: Checkout
