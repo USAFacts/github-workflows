@@ -2,12 +2,18 @@ name: branch
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
   workflow_call:
     secrets:
       NPM_TOKEN:
         required: true
       GIT_TOKEN:
         required: true
+    inputs:
+      cleanCheckout:
+        description: "Whether to prefer a clean checkout (debug purposes)"
+        required: true
+        type: boolean
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -18,7 +24,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          clean: false
+          clean: ${{inputs.cleanCheckout}}
           token: ${{secrets.GIT_TOKEN}}
       - name: Node
         uses: actions/setup-node@v2
