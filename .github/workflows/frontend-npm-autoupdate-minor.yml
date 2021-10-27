@@ -6,6 +6,12 @@ on:
         required: true
       GIT_TOKEN:
         required: true
+    inputs:
+      cleanCheckout:
+        description: "Whether to prefer a clean checkout (debug purposes)"
+        default: "false"
+        required: false
+        type: boolean
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}

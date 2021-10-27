@@ -9,7 +9,8 @@ on:
     inputs:
       cleanCheckout:
         description: "Whether to prefer a clean checkout (debug purposes)"
-        required: true
+        default: "false"
+        required: false
         type: boolean
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

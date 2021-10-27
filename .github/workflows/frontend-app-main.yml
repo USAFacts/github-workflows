@@ -18,7 +18,8 @@ on:
         type: number
       cleanCheckout:
         description: "Whether to prefer a clean checkout (debug purposes)"
-        required: true
+        default: "false"
+        required: false
         type: boolean
 env:
   SERVICE: ${{ inputs.serviceName }}
