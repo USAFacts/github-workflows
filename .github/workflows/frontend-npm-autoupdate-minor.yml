@@ -33,7 +33,7 @@ jobs:
           npx npm-check-updates /@usafacts/ --target minor -u
           npx npm-check-updates --target patch -u
           git add .
-          git commit -m "ci(autoupdate): Auto-update versions [skip ci]" --force
+          git commit -m "ci(autoupdate): Auto-update versions [skip ci]"
           npm version patch -m "ci(build): Bump package from $(npm info . version) to %s [skip ci]" --force
       - name: Install
         run: npm install --legacy-peer-deps
