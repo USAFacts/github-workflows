@@ -1,8 +1,12 @@
 name: "Combine PRs"
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 8 * * *"
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GIT_TOKEN:
+        required: true
 jobs:
   combine-prs:
     runs-on: [self-hosted, frontend]
