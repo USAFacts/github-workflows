@@ -9,7 +9,7 @@ on:
     inputs:
       cleanCheckout:
         description: "Whether to prefer a clean checkout (debug purposes)"
-        default: "false"
+        default: false
         required: false
         type: boolean
 env:

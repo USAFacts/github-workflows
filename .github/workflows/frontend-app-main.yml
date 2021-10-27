@@ -13,12 +13,12 @@ on:
         type: string
       prodReplicas:
         description: "How many pods for this service on Prod? (number, defaults 3)"
-        default: "3"
+        default: 3
         required: false
         type: number
       cleanCheckout:
         description: "Whether to prefer a clean checkout (debug purposes)"
-        default: "false"
+        default: false
         required: false
         type: boolean
 env:
