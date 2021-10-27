@@ -1,0 +1,96 @@
+name: main
+on:
+  workflow_call:
+    secrets:
+      GIT_TOKEN:
+        required: true
+    inputs:
+      serviceName:
+        description: "The qualified cluster name for the service. (EX: frontend-issues)"
+        required: true
+        type: string
+      prodReplicas:
+        description: "How many pods for this service on Prod? (number, defaults 3)"
+        default: "3"
+        required: false
+        type: number
+      cleanCheckout:
+        description: "Whether to prefer a clean checkout (debug purposes)"
+        required: true
+        type: boolean
+env:
+  SERVICE: ${{ inputs.serviceName }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+jobs:
+  version:
+    runs-on: [self-hosted, frontend]
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - id: version
+        run: echo "::set-output name=value::$(usafacts version)"
+  build:
+    runs-on: [self-hosted, frontend]
+    needs: [version]
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+      - name: Manifests
+        uses: actions/upload-artifact@v2
+        with:
+          name: manifests
+          path: manifests
+      - name: Container
+        run: usafacts container -r ${SERVICE}
+  dev:
+    runs-on: [self-hosted, deploy]
+    needs: [version, build]
+    environment: dev
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+      ENVIRONMENT: dev
+      REPLICAS: 2
+      NEW_RELIC_ENABLED: false
+    steps:
+      - name: Manifests
+        uses: actions/download-artifact@v2
+        with:
+          name: manifests
+      - name: Deploy
+        run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
+  qa:
+    runs-on: [self-hosted, deploy]
+    needs: [version, build, dev]
+    environment: qa
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+      ENVIRONMENT: qa
+      REPLICAS: 2
+      NEW_RELIC_ENABLED: false
+    steps:
+      - name: Manifests
+        uses: actions/download-artifact@v2
+        with:
+          name: manifests
+      - name: Deploy
+        run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
+  prod:
+    runs-on: [self-hosted, deploy]
+    needs: [version, build, dev, qa]
+    environment: prod
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+      ENVIRONMENT: prod
+      REPLICAS: ${{ inputs.prodReplicas }}
+      NEW_RELIC_ENABLED: true
+    steps:
+      - name: Manifests
+        uses: actions/download-artifact@v2
+        with:
+          name: manifests
+      - name: Deploy
+        run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
