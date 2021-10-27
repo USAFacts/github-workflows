@@ -28,8 +28,12 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Auto Update
         run: |
+          git config --global user.email "pipeline@usafacts.org"
+          git config --global user.name "Github Pipeline"
           npx npm-check-updates /@usafacts/ --target minor -u
           npx npm-check-updates --target patch -u
+          git add .
+          git commit -m "ci(autoupdate): Auto-update versions [skip ci]" --force
       - name: Install
         run: npm install --legacy-peer-deps
       - name: Save
