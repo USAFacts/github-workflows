@@ -9,7 +9,7 @@ on:
       branchesStartWith:
         description: "Merge PRs from Branches that start with this pattern"
         default: "dependabot/"
-        required: true
+        required: false
         type: string
 jobs:
   combine-prs:
