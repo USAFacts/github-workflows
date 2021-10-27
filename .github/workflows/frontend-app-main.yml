@@ -53,6 +53,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install
         run: npm install --legacy-peer-deps
+      - name: Build
+        run: npm run build
       - name: Manifests
         uses: actions/upload-artifact@v2
         with:
