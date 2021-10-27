@@ -4,6 +4,8 @@ on:
     secrets:
       GIT_TOKEN:
         required: true
+      NPM_TOKEN:
+        required: true
     inputs:
       serviceName:
         description: "The qualified cluster name for the service. (EX: frontend-issues)"
@@ -20,6 +22,7 @@ on:
         type: boolean
 env:
   SERVICE: ${{ inputs.serviceName }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   version:
