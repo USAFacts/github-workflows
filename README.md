@@ -9,7 +9,8 @@ We use shareable Github Workflows to minimize duplicate code across our many rep
 # Environments
 ## Frontend
 ### Frontend Libraries
-1. Copy `./frontend/library-*.yml` into `<your repo>/.github/workflows/`
+1. Copy `./frontend/library-main.yml` *OR* `./frontend/library-cjs.yml` into `<your repo>/.github/workflows/` (Depending on your library's build use case)
+2. Copy `./frontend/library-branch.yml` into `<your repo>/.github/workflows/`
 
 ### Frontend Apps
 1. Copy `/frontend/app-*.yml` into `<your repo>/.github/workflows/`
