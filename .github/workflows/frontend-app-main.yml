@@ -25,6 +25,7 @@ env:
   SERVICE: ${{ inputs.serviceName }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+  AXIOS_DNS_DISABLE: "true"
 jobs:
   version:
     runs-on: [self-hosted, frontend]
