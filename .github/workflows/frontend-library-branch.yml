@@ -42,6 +42,14 @@ jobs:
         id: retry1
         if: steps.test.outcome=='failure'
         run: npm run test
+      # If you got to this point, we'll do a clean checkout to clear the git cache.
+      # This legitimately has fixed multiple build-time sanity errors.
+      - name: Checkout
+        if: steps.retry1.outcome=='failure'
+        uses: actions/checkout@v2
+        with:
+          clean: true
+          token: ${{secrets.GIT_TOKEN}}
       - name: Test-Retry2
         if: steps.retry1.outcome=='failure'
         run: npm run test
