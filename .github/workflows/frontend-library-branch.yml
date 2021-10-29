@@ -34,4 +34,14 @@ jobs:
       - name: Install
         run: npm install --legacy-peer-deps
       - name: Test
+        id: test
+        continue-on-error: true
+        run: npm run test
+      - name: Test-Retry1
+        continue-on-error: true
+        id: retry1
+        if: steps.test.outcome=='failure'
+        run: npm run test
+      - name: Test-Retry2
+        if: steps.retry1.outcome=='failure'
         run: npm run test
