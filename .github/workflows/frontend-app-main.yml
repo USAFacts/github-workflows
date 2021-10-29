@@ -38,6 +38,7 @@ jobs:
     needs: [version]
     env:
       VERSION: ${{needs.version.outputs.value}}
+      CI: false
     steps:
       - name: Checkout
         uses: actions/checkout@v2
