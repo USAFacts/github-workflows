@@ -45,4 +45,6 @@ jobs:
         run: |
           git reset --hard
           git clean -f -d
+          git tag -d $(git tag -l)
+          git fetch --all --prune
           git push --force

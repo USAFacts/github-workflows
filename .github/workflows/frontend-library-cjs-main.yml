@@ -33,6 +33,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Version
         run: |
+          git tag -d $(git tag -l)
+          git fetch --all --prune
           git config --global user.email "pipeline@usafacts.org"
           git config --global user.name "Github Pipeline"
           npm version patch -m "ci(build): Bump package from $(npm info . version) to %s [skip ci]" --force
