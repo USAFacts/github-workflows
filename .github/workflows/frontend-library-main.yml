@@ -48,7 +48,7 @@ jobs:
       - name: Install
         run: npm install --legacy-peer-deps
       - name: Test
-        if: ${{ inputs.skipTests === false }}
+        if: ${{ !inputs.skipTests }}
         id: test
         continue-on-error: true
         run: npm run test
