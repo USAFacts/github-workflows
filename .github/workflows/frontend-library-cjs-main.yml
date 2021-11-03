@@ -12,11 +12,16 @@ on:
         default: false
         required: false
         type: boolean
+      skipTests:
+        description: "Whether to skip tests. (default false)"
+        default: false
+        required: false
+        type: boolean
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
-  release:
+  test:
     runs-on: [self-hosted, frontend]
     steps:
       - name: Checkout
@@ -43,6 +48,7 @@ jobs:
       - name: Install
         run: npm install --legacy-peer-deps
       - name: Test
+        if: ${{ !inputs.skipTests }}
         id: test
         continue-on-error: true
         run: npm run test
