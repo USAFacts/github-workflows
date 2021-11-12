@@ -64,6 +64,19 @@ jobs:
           path: manifests
       - name: Container
         run: usafacts container -r ${SERVICE}
+  tag:
+    runs-on: [self-hosted, frontend]
+    needs: [version, build]
+    steps:
+      - name: Version
+        run: |
+          git tag -d ${{needs.version.outputs.value}}
+          git fetch --all --prune
+          git config --global user.email "pipeline@usafacts.org"
+          git config --global user.name "Github Pipeline"
+          git reset --hard
+          git clean -f -d
+          git push --follow-tags --force
   dev:
     runs-on: [self-hosted, deploy]
     needs: [version, build]
