@@ -125,3 +125,18 @@ jobs:
           name: manifests
       - name: Deploy
         run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
+  post-prod:
+    runs-on: [self-hosted, deploy]
+    needs: [version, build, prod]
+    steps:
+      - name: NR Deploy Marker
+        continue-on-error: true
+        uses: newrelic/deployment-marker-action@v1
+        env:
+          NEWRELIC_APP_ID: ${{ secrets.NEWRELIC_APP_ID }}
+        if: env.NEWRELIC_APP_ID != null
+        with:
+          apiKey: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
+          accountId: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
+          applicationId: ${{ secrets.NEWRELIC_APP_ID }}
+          revision: ${{needs.version.outputs.value}}
