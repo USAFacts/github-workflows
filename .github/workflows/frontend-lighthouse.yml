@@ -8,7 +8,7 @@ on:
         required: true
       TEST_URL:
         required: true
-      LH_BUILD_TOKEN:
+      LH_ADMIN_TOKEN:
         required: true
 env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
             --config=./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js \
             --collect.url="${{ secrets.TEST_URL }}"" \
             --upload.githubToken=${{ secrets.GITHUB_TOKEN }} \
-            --upload.token=${{ secrets.LH_BUILD_TOKEN }}
+            --upload.token=${{ secrets.LH_ADMIN_TOKEN }}
       - name: Display
         run: cat .lighthouse/report.${{ secrets.TEST_URL }}.json
       - name: Results
