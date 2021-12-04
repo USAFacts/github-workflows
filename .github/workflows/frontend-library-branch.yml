@@ -58,7 +58,7 @@ jobs:
       - name: Test-Retry2
         if: steps.retry1.outcome=='failure'
         run: npm run test
-      - name: Storybook
+      - name: QA-Storybook
         if: ${{ inputs.qaStorybook }}
         continue-on-error: true
         run: |
