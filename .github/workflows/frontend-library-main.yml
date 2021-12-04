@@ -86,10 +86,17 @@ jobs:
         run: |
           npm run build-storybook
           usafacts azsync --source "${GITHUB_WORKSPACE}/storybook-static" --container "storybook/${GITHUB_REPOSITORY#*/}"
-  document:
+  publish-release:
+    runs-on: [self-hosted, frontend]
     needs: ["release"]
-    uses: usafacts/github-workflows/.github/workflows/frontend-release.yml@main
-    secrets:
-      GIT_TOKEN: ${{secrets.GIT_TOKEN}}
-    with:
-      version: ${{needs.release.outputs.value}}
+    steps:
+      - name: Release
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            await github.rest.repos.createRelease({
+              ...context.repo,
+              tag_name: '${{needs.release.outputs.value}}',
+              name: 'V${{needs.release.outputs.value}}',
+              generate_release_notes: true
+            });

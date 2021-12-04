@@ -68,15 +68,35 @@ jobs:
     runs-on: [self-hosted, frontend]
     needs: [version, build]
     steps:
-      - name: Version
-        run: |
-          git tag -d ${{needs.version.outputs.value}}
-          git fetch --all --prune
-          git config --global user.email "pipeline@usafacts.org"
-          git config --global user.name "Github Pipeline"
-          git reset --hard
-          git clean -f -d
-          git push --follow-tags --force
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: ${{inputs.cleanCheckout}}
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Release
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            const tag = "${{needs.version.outputs.value}}";
+            const message = `version ${tag}`;
+            const createTagResponse = await github.rest.git.createTag({
+              ...context.repo,
+              tag: tag,
+              message: message,
+              object: context.sha,
+              type: "commit"
+            })
+            await github.rest.git.createRef({
+              ...context.repo,
+              ref: `refs/tags/${tag}`,
+              sha: createTagResponse.data.sha
+            })
+            await github.rest.repos.createRelease({
+              ...context.repo,
+              tag_name: tag,
+              name: 'Version ' + tag,
+              generate_release_notes: true
+            });
   dev:
     runs-on: [self-hosted, deploy]
     needs: [version, build]
@@ -126,7 +146,7 @@ jobs:
       - name: Deploy
         run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
   post-prod:
-    runs-on: [self-hosted, deploy]
+    runs-on: ubuntu-latest
     needs: [version, build, prod]
     steps:
       - name: NR Deploy Marker
