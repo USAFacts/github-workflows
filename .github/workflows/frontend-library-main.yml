@@ -21,8 +21,10 @@ env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
-  test:
+  release:
     runs-on: [self-hosted, frontend]
+    outputs:
+      value: ${{ steps.Version.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -43,6 +45,7 @@ jobs:
           git config --global user.email "pipeline@usafacts.org"
           git config --global user.name "Github Pipeline"
           npm version patch -m "ci(build): Bump package from $(npm info . version) to %s [skip ci]" --force
+          echo "::set-output name=value::$(npm info . version)"
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install
@@ -72,7 +75,6 @@ jobs:
           git push --follow-tags --force
         continue-on-error: true
         # If the `versionsave` step fails, we want to try to rollback the push we did for NPM prior to that.
-        # TODO - This doesn't actually work - I'm not sure if our tokens have access to unpublish commands.
       - name: NPM-Rollback
         if: ${{ steps.versionsave.outcome == 'failure' }}
         run: |
@@ -84,3 +86,10 @@ jobs:
         run: |
           npm run build-storybook
           usafacts azsync --source "${GITHUB_WORKSPACE}/storybook-static" --container "storybook/${GITHUB_REPOSITORY#*/}"
+  document:
+    needs: ["release"]
+    uses: usafacts/github-workflows/.github/workflows/frontend-release.yml@main
+    secrets:
+      GIT_TOKEN: ${{secrets.GIT_TOKEN}}
+    with:
+      version: ${{needs.release.outputs.value}}
