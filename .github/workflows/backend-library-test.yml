@@ -1,0 +1,13 @@
+name: backend-library-test
+on:
+  workflow_call:
+jobs:
+  test:
+    runs-on: [ self-hosted, backend ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+      - name: Test
+        run: usafacts test
