@@ -56,4 +56,6 @@ jobs:
         with:
           name: manifests
       - name: Deploy
-        run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
+        run: |
+          usafacts apply -e ${ENVIRONMENT} -f service.yml
+          usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
