@@ -1,0 +1,59 @@
+name: backend-service-deploy
+on:
+  workflow_call:
+    inputs:
+      serviceName:
+        description: "The qualified cluster service name."
+        required: true
+        type: string
+      replicas:
+        description: "How many pods for this service? (number, defaults 3)"
+        default: 3
+        required: false
+        type: number
+      version:
+        description: "Version to deploy"
+        required: true
+        type: string
+      environment:
+        description: "Environment to deploy"
+        required: true
+        type: string
+      flywayPlaceholdersAppPassword:
+        required: false
+        type: string
+      flywayPlaceholdersAppRoPassword:
+        required: false
+        type: string
+env:
+  ENVIRONMENT: ${{inputs.environment}}
+  FLYWAY_PLACEHOLDERS_APP_PASSWORD: ${{inputs.flywayPlaceholdersAppPassword}}
+  FLYWAY_PLACEHOLDERS_APP_RO_PASSWORD: ${{inputs.flywayPlaceholdersAppRoPassword}}
+  REPLICAS: ${{inputs.replicas}}
+  SERVICE: ${{inputs.serviceName}}
+  VERSION: ${{inputs.version}}
+jobs:
+  manifests:
+    runs-on: [ self-hosted, deploy ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+          ref: ${{inputs.version}}
+      - name: Manifests
+        uses: actions/upload-artifact@v2
+        with:
+          name: manifests
+          path: manifests
+  deploy:
+    runs-on: [ self-hosted, deploy ]
+    needs: [ manifests ]
+    environment: ${{inputs.environment}}
+    steps:
+      - name: Manifests
+        uses: actions/download-artifact@v2
+        with:
+          name: manifests
+      - name: Deploy
+        run: usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}

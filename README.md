@@ -14,6 +14,12 @@ We use shareable Github Workflows to minimize duplicate code across our many rep
 
 ### Frontend Apps
 1. Copy `/frontend/app-*.yml` into `<your repo>/.github/workflows/`
+
 ## Backend
+### Backend Libraries
+1. Copy `./backend/library/*.yml` into `<your repo>/.github/workflows/`
+
+### Backend Services
+1. Copy `/backend/service/*.yml` into `<your repo>/.github/workflows/`
 
 ## Data

@@ -1,0 +1,53 @@
+name: backend-library-publish
+on:
+  workflow_call:
+    secrets:
+      GIT_TOKEN:
+        required: true
+env:
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+jobs:
+  version:
+    runs-on: [ self-hosted, backend ]
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - id: version
+        run: echo "::set-output name=value::$(usafacts version)"
+  container:
+    runs-on: [ self-hosted, backend ]
+    needs: [ version ]
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Build
+        run: usafacts build
+      - name: Publish
+        run: ./gradlew publishUsafactsPublicationToUSAFactsRepository
+      - name: Release
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            const tag = "${{needs.version.outputs.value}}";
+            const message = `version ${tag}`;
+            const createTagResponse = await github.rest.git.createTag({
+              ...context.repo,
+              tag: tag,
+              message: message,
+              object: context.sha,
+              type: "commit"
+            })
+            await github.rest.git.createRef({
+              ...context.repo,
+              ref: `refs/tags/${tag}`,
+              sha: createTagResponse.data.sha
+            })
+            await github.rest.repos.createRelease({
+              ...context.repo,
+              tag_name: tag,
+            });

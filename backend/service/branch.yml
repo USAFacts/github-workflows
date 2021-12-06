@@ -1,0 +1,8 @@
+name: branch
+on:
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+  workflow_dispatch:
+jobs:
+  test:
+    uses: usafacts/github-workflows/.github/workflows/backend-service-test.yml@main
