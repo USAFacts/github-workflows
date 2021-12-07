@@ -105,5 +105,5 @@ jobs:
               ...context.repo,
               tag_name: '${{ steps.version.outputs.value }}',
               name: 'V${{ steps.version.outputs.value }}',
-              generate_release_notes: 'true'
+              generate_release_notes: true
             });
