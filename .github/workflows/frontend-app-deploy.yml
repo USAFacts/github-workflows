@@ -1,0 +1,60 @@
+name: frontend-app-deploy
+on:
+  workflow_call:
+    inputs:
+      serviceName:
+        description: "The qualified cluster service name."
+        required: true
+        type: string
+      replicas:
+        description: "How many pods for this service? (number, defaults 3)"
+        default: 3
+        required: false
+        type: number
+      version:
+        description: "Version to deploy"
+        required: true
+        type: string
+      environment:
+        description: "Environment to deploy"
+        required: true
+        type: string
+      newRelicEnabled:
+        description: "Enable NewRelic in environment? (boolean, defaults false)"
+        default: false
+        required: true
+        type: boolean
+env:
+  ENVIRONMENT: ${{inputs.environment}}
+  REPLICAS: ${{inputs.replicas}}
+  SERVICE: ${{inputs.serviceName}}
+  VERSION: ${{inputs.version}}
+  NEW_RELIC_ENABLED: ${{inputs.newRelicEnabled}}
+  AXIOS_DNS_DISABLE: "true"
+jobs:
+  manifests:
+    runs-on: [ self-hosted, deploy ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+          ref: ${{inputs.version}}
+      - name: Manifests
+        uses: actions/upload-artifact@v2
+        with:
+          name: manifests
+          path: manifests
+  deploy:
+    runs-on: [ self-hosted, deploy ]
+    needs: [ manifests ]
+    environment: ${{inputs.environment}}
+    steps:
+      - name: Manifests
+        uses: actions/download-artifact@v2
+        with:
+          name: manifests
+      - name: Deploy
+        run: |
+          usafacts apply -e ${ENVIRONMENT} -f service.yml
+          usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}

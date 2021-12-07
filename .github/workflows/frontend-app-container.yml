@@ -1,0 +1,88 @@
+name: frontend-app-container
+on:
+  workflow_call:
+    secrets:
+      GIT_TOKEN:
+        required: true
+      NPM_TOKEN:
+        required: true
+    inputs:
+      serviceName:
+        description: "The qualified cluster name for the service. (EX: frontend-issues)"
+        required: true
+        type: string
+      cleanCheckout:
+        description: "Whether to prefer a clean checkout (debug purposes)"
+        default: false
+        required: false
+        type: boolean
+env:
+  SERVICE: ${{ inputs.serviceName }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+jobs:
+  version:
+    runs-on: [self-hosted, frontend]
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - id: version
+        run: echo "::set-output name=value::$(usafacts version)"
+  container:
+    runs-on: [self-hosted, frontend]
+    needs: [version]
+    env:
+      VERSION: ${{needs.version.outputs.value}}
+      CI: false
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: ${{inputs.cleanCheckout}}
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install
+        run: npm install --legacy-peer-deps
+      - name: Build
+        run: npm run build
+      - name: Container
+        run: usafacts container -r ${SERVICE}
+  release:
+    runs-on: [self-hosted, frontend]
+    needs: [version, build]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: ${{inputs.cleanCheckout}}
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Release
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            const tag = "${{needs.version.outputs.value}}";
+            const message = `version ${tag}`;
+            const createTagResponse = await github.rest.git.createTag({
+              ...context.repo,
+              tag: tag,
+              message: message,
+              object: context.sha,
+              type: "commit"
+            })
+            await github.rest.git.createRef({
+              ...context.repo,
+              ref: `refs/tags/${tag}`,
+              sha: createTagResponse.data.sha
+            })
+            await github.rest.repos.createRelease({
+              ...context.repo,
+              tag_name: tag,
+              name: 'Version ' + tag,
+              generate_release_notes: true
+            });
