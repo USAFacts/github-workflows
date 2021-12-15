@@ -15,23 +15,25 @@ jobs:
     if: ${{github.event.inputs.environment == 'dev'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
     with:
-      serviceName: "${GITHUB_REPOSITORY#*/}"
+      serviceName: ${{ github.event.repository.name }}
       environment: dev
       replicas: 3
       version: ${{github.event.inputs.version}}
+      newRelicEnabled: false
   qa:
     if: ${{github.event.inputs.environment == 'qa'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
     with:
-      serviceName: "${GITHUB_REPOSITORY#*/}"
+      serviceName: ${{ github.event.repository.name }}
       environment: qa
       replicas: 3
       version: ${{github.event.inputs.version}}
+      newRelicEnabled: false
   prod:
     if: ${{github.event.inputs.environment == 'prod'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
     with:
-      serviceName: "${GITHUB_REPOSITORY#*/}"
+      serviceName: ${{ github.event.repository.name }}
       environment: prod
       replicas: 15
       version: ${{github.event.inputs.version}}

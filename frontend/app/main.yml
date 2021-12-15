@@ -4,10 +4,10 @@ on:
     branches: [main]
   workflow_dispatch:
 jobs:
-  test:
+  container:
     uses: usafacts/github-workflows/.github/workflows/frontend-app-container.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
     with:
-      serviceName: "${GITHUB_REPOSITORY#*/}"
+      serviceName: ${{ github.event.repository.name }}
