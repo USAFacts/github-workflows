@@ -1,0 +1,38 @@
+name: deploy
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to deploy"
+        required: true
+        type: string
+      environment:
+        description: "Environment to deploy"
+        required: true
+        type: environment
+jobs:
+  dev:
+    if: ${{github.event.inputs.environment == 'dev'}}
+    uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
+    with:
+      serviceName: "${GITHUB_REPOSITORY#*/}"
+      environment: dev
+      replicas: 3
+      version: ${{github.event.inputs.version}}
+  qa:
+    if: ${{github.event.inputs.environment == 'qa'}}
+    uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
+    with:
+      serviceName: "${GITHUB_REPOSITORY#*/}"
+      environment: qa
+      replicas: 3
+      version: ${{github.event.inputs.version}}
+  prod:
+    if: ${{github.event.inputs.environment == 'prod'}}
+    uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
+    with:
+      serviceName: "${GITHUB_REPOSITORY#*/}"
+      environment: prod
+      replicas: 15
+      version: ${{github.event.inputs.version}}
+      newRelicEnabled: true
