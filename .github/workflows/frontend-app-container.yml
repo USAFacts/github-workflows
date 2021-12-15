@@ -55,7 +55,7 @@ jobs:
         run: usafacts container -r ${SERVICE}
   release:
     runs-on: [self-hosted, frontend]
-    needs: [version, build]
+    needs: [version, container]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
