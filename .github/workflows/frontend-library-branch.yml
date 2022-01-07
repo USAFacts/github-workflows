@@ -49,7 +49,7 @@ jobs:
         run: npm run test
       # If you got to this point, we'll do a clean checkout to clear the git cache.
       # This legitimately has fixed multiple build-time sanity errors.
-      - name: Checkout
+      - name: DesperateCheckout
         if: steps.retry1.outcome=='failure'
         uses: actions/checkout@v2
         with:
