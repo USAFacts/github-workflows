@@ -86,24 +86,29 @@ jobs:
         run: |
           npm run build-storybook
           usafacts azsync --source "${GITHUB_WORKSPACE}/storybook-static" --container "storybook/${GITHUB_REPOSITORY#*/}"
+  version:
+    runs-on: [self-hosted, frontend]
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - id: version
+        run: echo "::set-output name=value::$(npm info . version)"
   publish-release:
     runs-on: [self-hosted, frontend]
-    needs: ["release"]
+    needs: [release, version]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           clean: false
           token: ${{secrets.GIT_TOKEN}}
-      - id: version
-        run: echo "::set-output name=value::$(npm info . version)"
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
           script: |
             await github.rest.repos.createRelease({
               ...context.repo,
-              tag_name: '${{ steps.version.outputs.value }}',
-              name: 'V${{ steps.version.outputs.value }}',
+              tag_name: '${{ needs.version.outputs.value }}',
+              name: 'V${{ needs.version.outputs.value }}',
               generate_release_notes: true
             });
