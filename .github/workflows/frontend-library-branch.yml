@@ -37,14 +37,21 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install
+        id: install
+        continue-on-error: true
         run: npm install --legacy-peer-deps
+      - name: Install-Retry1
+        continue-on-error: true
+        id: installRetry1
+        if: steps.install.outcome=='failure'
+        run: npm rebuild && npm cache clean --force && npm i --legacy-peer-deps
       - name: Test
         id: test
         continue-on-error: true
         run: npm run test
       - name: Test-Retry1
         continue-on-error: true
-        id: retry1
+        id: testRetry1
         if: steps.test.outcome=='failure'
         run: npm run test
       # If you got to this point, we'll do a clean checkout to clear the git cache.
@@ -56,6 +63,7 @@ jobs:
           clean: true
           token: ${{secrets.GIT_TOKEN}}
       - name: Test-Retry2
+        id: testRetry2
         if: steps.retry1.outcome=='failure'
         run: npm run test
       - name: QA-Storybook
