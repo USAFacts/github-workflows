@@ -39,7 +39,7 @@ jobs:
         run: |
           lhci autorun \
             --config=./node_modules/@usafacts/frontend-library-testing/.lighthouserc.js \
-            --collect.url="${{ secrets.TEST_URL }}"" \
+            --collect.url="${{ secrets.TEST_URL }}" \
             --upload.githubToken=${{ secrets.GITHUB_TOKEN }} \
             --upload.token=${{ secrets.LH_ADMIN_TOKEN }}
       - name: Display
