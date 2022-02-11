@@ -35,6 +35,8 @@ jobs:
         run: |
           npm install --legacy-peer-deps
           npm install -g @lhci/cli@0.8.x
+      - name: BuildProd
+        run: npm run build
       - name: Lighthouse
         run: |
           lhci autorun \
