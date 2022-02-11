@@ -29,6 +29,14 @@ jobs:
       replicas: 3
       version: ${{github.event.inputs.version}}
       newRelicEnabled: false
+  lighthouse:
+    if: ${{github.event.inputs.environment == 'prod'}}
+    uses: usafacts/github-workflows/.github/workflows/frontend-lighthouse.yml@main
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+      TEST_URL: "https://usafacts.org/visualizations/coronavirus-covid-19-spread-map"
+      LH_ADMIN_TOKEN: ${{ secrets.LH_ADMIN_TOKEN }}
   prod:
     if: ${{github.event.inputs.environment == 'prod'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
