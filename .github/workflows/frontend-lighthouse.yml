@@ -15,7 +15,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: [self-hosted, frontend]
     steps:
       - name: SetupOS
         run: sudo snap install chromium
