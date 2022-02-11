@@ -37,6 +37,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
       TEST_URL: "http://localhost/issues/climate"
+      LH_ADMIN_TOKEN: ${{ secrets.LH_ADMIN_TOKEN }}
   covid-cases:
     needs: [reports]
     if: ${{needs.reports.outputs.covidCases}} == 'true'
@@ -45,6 +46,7 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
       TEST_URL: "http://localhost/visualizations/coronavirus-covid-19-spread-map"
+      LH_ADMIN_TOKEN: ${{ secrets.LH_ADMIN_TOKEN }}
   covid-vaccines:
     needs: [reports]
     if: ${{needs.reports.outputs.covidVaccines}} == 'true'
@@ -53,3 +55,4 @@ jobs:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
       TEST_URL: "https://localhost/visualizations/covid-vaccine-tracker-states"
+      LH_ADMIN_TOKEN: ${{ secrets.LH_ADMIN_TOKEN }}
