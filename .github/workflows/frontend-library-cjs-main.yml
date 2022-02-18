@@ -21,7 +21,7 @@ env:
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 jobs:
-  test:
+  release:
     runs-on: [self-hosted, frontend]
     steps:
       - name: Checkout
