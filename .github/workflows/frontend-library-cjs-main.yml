@@ -74,7 +74,6 @@ jobs:
           git push --follow-tags --force
         continue-on-error: true
         # If the `versionsave` step fails, we want to try to rollback the push we did for NPM prior to that.
-        # TODO - This doesn't actually work - I'm not sure if our tokens have access to unpublish commands.
       - name: NPM-Rollback
         if: ${{ steps.versionsave.outcome == 'failure' }}
         run: |
@@ -86,3 +85,42 @@ jobs:
         run: |
           npm run build-storybook
           usafacts azsync --source "${GITHUB_WORKSPACE}/storybook-static" --container "storybook/${GITHUB_REPOSITORY#*/}"
+  version:
+    runs-on: [self-hosted, frontend]
+    needs: [release]
+    outputs:
+      value: ${{ steps.version.outputs.value }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: ${{inputs.cleanCheckout}}
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+          registry-url: "https://registry.npmjs.org"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - id: version
+        run: echo "::set-output name=value::$(npm info . version)"
+  publish-release:
+    runs-on: [self-hosted, frontend]
+    needs: [release, version]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: false
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Release
+        uses: actions/github-script@v5.0.0
+        with:
+          script: |
+            await github.rest.repos.createRelease({
+              ...context.repo,
+              tag_name: '${{ needs.version.outputs.value }}',
+              name: 'V${{ needs.version.outputs.value }}',
+              generate_release_notes: true
+            });
