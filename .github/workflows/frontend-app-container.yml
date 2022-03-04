@@ -62,6 +62,10 @@ jobs:
         with:
           clean: ${{inputs.cleanCheckout}}
           token: ${{secrets.GIT_TOKEN}}
+      - name: Version
+        run: |
+          git tag -d $(git tag -l)
+          git fetch --all --prune
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
