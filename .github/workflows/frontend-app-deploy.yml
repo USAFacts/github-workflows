@@ -33,7 +33,7 @@ env:
   AXIOS_DNS_DISABLE: "true"
 jobs:
   manifests:
-    runs-on: [ self-hosted, deploy ]
+    runs-on: [self-hosted, deploy]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -46,8 +46,8 @@ jobs:
           name: manifests
           path: manifests
   deploy:
-    runs-on: [ self-hosted, deploy ]
-    needs: [ manifests ]
+    runs-on: [self-hosted, deploy]
+    needs: [manifests]
     environment: ${{inputs.environment}}
     steps:
       - name: Manifests
@@ -58,3 +58,16 @@ jobs:
         run: |
           usafacts apply -e ${ENVIRONMENT} -f service.yml
           usafacts deploy -e ${ENVIRONMENT} -f deployment.yml -n ${SERVICE}
+  newrelic:
+    runs-on: [self-hosted, frontend]
+    needs: [deploy]
+    steps:
+      - name: NR Deploy Marker
+        continue-on-error: true
+        uses: newrelic/deployment-marker-action@v1
+        if: ${{ secrets.NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
+        with:
+          apiKey: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
+          accountId: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
+          applicationId: ${{ secrets.NEWRELIC_APP_ID }}
+          revision: ${{needs.version.outputs.value}}
