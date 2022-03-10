@@ -24,13 +24,20 @@ on:
         default: false
         required: true
         type: boolean
+      newRelicAppId:
+        description: "NewRelic App Id"
+        required: false
+        type: string
 env:
   ENVIRONMENT: ${{inputs.environment}}
   REPLICAS: ${{inputs.replicas}}
   SERVICE: ${{inputs.serviceName}}
   VERSION: ${{inputs.version}}
   NEW_RELIC_ENABLED: ${{inputs.newRelicEnabled}}
+  NEW_RELIC_APP_ID: ${{inputs.newRelicAppId}}
   AXIOS_DNS_DISABLE: "true"
+  NEWRELIC_USERKEY_ANTHONY: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
+  NEWRELIC_ACCOUNT_ID: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
 jobs:
   manifests:
     runs-on: [self-hosted, deploy]
@@ -65,9 +72,9 @@ jobs:
       - name: NR Deploy Marker
         continue-on-error: true
         uses: newrelic/deployment-marker-action@v1
-        if: ${{ secrets.NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
+        if: ${{ NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
         with:
-          apiKey: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
-          accountId: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
-          applicationId: ${{ secrets.NEWRELIC_APP_ID }}
+          apiKey: ${{ NEWRELIC_USERKEY_ANTHONY }}
+          accountId: ${{ NEWRELIC_ACCOUNT_ID }}
+          applicationId: ${{ NEWRELIC_APP_ID }}
           revision: ${{needs.version.outputs.value}}
