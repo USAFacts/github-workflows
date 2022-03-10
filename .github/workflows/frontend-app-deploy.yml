@@ -72,7 +72,7 @@ jobs:
         uses: newrelic/deployment-marker-action@v1
         if: ${{ secrets.NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
         with:
-          apiKey: ${{ NEWRELIC_USERKEY_ANTHONY }}
-          accountId: ${{ NEWRELIC_ACCOUNT_ID }}
+          apiKey: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
+          accountId: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
           applicationId: ${{ secrets.NEW_RELIC_APP_ID }}
           revision: ${{needs.version.outputs.value}}
