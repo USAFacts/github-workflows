@@ -70,7 +70,7 @@ jobs:
       - name: NR Deploy Marker
         continue-on-error: true
         uses: newrelic/deployment-marker-action@v1
-        if: ${{ NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
+        if: ${{ secrets.NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
         with:
           apiKey: ${{ NEWRELIC_USERKEY_ANTHONY }}
           accountId: ${{ NEWRELIC_ACCOUNT_ID }}
