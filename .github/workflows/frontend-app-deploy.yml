@@ -34,6 +34,7 @@ env:
   VERSION: ${{inputs.version}}
   NEW_RELIC_ENABLED: ${{inputs.newRelicEnabled}}
   AXIOS_DNS_DISABLE: "true"
+  NEWRELIC_APP_ID: ${{ secrets.NEW_RELIC_APP_ID }}
   NEWRELIC_USERKEY_ANTHONY: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
   NEWRELIC_ACCOUNT_ID: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
 jobs:
@@ -70,9 +71,9 @@ jobs:
       - name: NR Deploy Marker
         continue-on-error: true
         uses: newrelic/deployment-marker-action@v1
-        if: ${{ secrets.NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
+        if: ${{ NEWRELIC_APP_ID }} != null && ${ENVIRONMENT} === 'prod'
         with:
           apiKey: ${{ secrets.NEWRELIC_USERKEY_ANTHONY }}
           accountId: ${{ secrets.NEWRELIC_ACCOUNT_ID }}
-          applicationId: ${{ secrets.NEW_RELIC_APP_ID }}
+          applicationId: ${{ NEWRELIC_APP_ID }}
           revision: ${{needs.version.outputs.value}}
