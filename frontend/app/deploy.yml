@@ -41,7 +41,7 @@ jobs:
     if: ${{github.event.inputs.environment == 'prod'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
     secrets:
-      NPM_TOKEN: ${{ secrets.NEWRELIC_APP_ID }}
+      NEWRELIC_APP_ID: ${{ secrets.NEWRELIC_APP_ID }}
     with:
       serviceName: ${{ github.event.repository.name }}
       environment: prod
