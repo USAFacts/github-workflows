@@ -9,8 +9,6 @@ jobs:
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       GIT_TOKEN: ${{ secrets.ADMIN_TOKEN }}
-    with:
-      serviceName: ${{ github.event.repository.name }}
   container:
     uses: usafacts/github-workflows/.github/workflows/frontend-app-container.yml@main
     secrets:
