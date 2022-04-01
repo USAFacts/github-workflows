@@ -19,7 +19,6 @@ jobs:
       environment: dev
       replicas: 3
       version: ${{github.event.inputs.version}}
-      newRelicEnabled: false
   qa:
     if: ${{github.event.inputs.environment == 'qa'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-app-deploy.yml@main
@@ -28,7 +27,6 @@ jobs:
       environment: qa
       replicas: 3
       version: ${{github.event.inputs.version}}
-      newRelicEnabled: false
   lighthouse:
     if: ${{github.event.inputs.environment == 'prod'}}
     uses: usafacts/github-workflows/.github/workflows/frontend-lighthouse.yml@main
@@ -45,4 +43,3 @@ jobs:
       environment: prod
       replicas: 15
       version: ${{github.event.inputs.version}}
-      newRelicEnabled: true

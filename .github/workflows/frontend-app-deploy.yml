@@ -19,17 +19,11 @@ on:
         description: "Environment to deploy"
         required: true
         type: string
-      newRelicEnabled:
-        description: "Enable NewRelic in environment? (boolean, defaults false)"
-        default: false
-        required: true
-        type: boolean
 env:
   ENVIRONMENT: ${{inputs.environment}}
   REPLICAS: ${{inputs.replicas}}
   SERVICE: ${{inputs.serviceName}}
   VERSION: ${{inputs.version}}
-  NEW_RELIC_ENABLED: ${{inputs.newRelicEnabled}}
   AXIOS_DNS_DISABLE: "true"
 jobs:
   manifests:
