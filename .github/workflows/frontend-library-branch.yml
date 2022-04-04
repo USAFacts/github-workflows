@@ -48,7 +48,9 @@ jobs:
       - name: Test
         id: test
         continue-on-error: true
-        run: npm run test
+        run: |
+          git fetch origin main:main
+          npm run test
       - name: Test-Retry1
         continue-on-error: true
         id: testRetry1
