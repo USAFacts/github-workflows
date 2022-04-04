@@ -72,7 +72,6 @@ jobs:
         uses: raulanatol/jest-coverage-comment-action@main
         with:
           github-token: ${{secrets.GIT_TOKEN}}
-          jest-command: "npm run test:unit:coverage"
       - name: QA-Storybook
         if: ${{ inputs.qaStorybook }}
         continue-on-error: true
