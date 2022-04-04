@@ -67,6 +67,7 @@ jobs:
         if: steps.testRetry1.outcome=='failure'
         run: npm run test
       - name: Coverage
+        continue-on-error: true
         id: coverage
         uses: raulanatol/jest-coverage-comment-action@main
         with:
