@@ -1,0 +1,67 @@
+name: branch
+on:
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
+      GIT_TOKEN:
+        required: true
+    inputs:
+      cleanCheckout:
+        description: "Whether to prefer a clean checkout (debug purposes)"
+        default: false
+        required: false
+        type: boolean
+      qaStorybook:
+        description: "Whether to build and deploy a QA Storybook doc"
+        default: false
+        required: false
+        type: boolean
+env:
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+jobs:
+  test:
+    runs-on: [self-hosted, frontend]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          clean: ${{inputs.cleanCheckout}}
+          token: ${{secrets.GIT_TOKEN}}
+      - name: Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          registry-url: "https://registry.npmjs.org"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install
+        id: install
+        continue-on-error: true
+        run: npm install --legacy-peer-deps
+      - name: Test
+        id: test
+        continue-on-error: true
+        run: |
+          git fetch origin main:main
+          npm run test
+      - run: npm run build
+  coverage:
+    runs-on: [self-hosted, frontend]
+    steps:
+      - uses: raulanatol/jest-coverage-comment-action@main
+        continue-on-error: true
+        with:
+          github-token: ${{secrets.GIT_TOKEN}}
+          jest-command: "npm run test:unit:coverage"
+  storybook:
+    runs-on: [self-hosted, frontend]
+    needs: [test]
+    steps:
+      - name: QA-Storybook
+        if: ${{ inputs.qaStorybook }}
+        continue-on-error: true
+        run: |
+          npm run build-storybook
+          usafacts azsync --source "${GITHUB_WORKSPACE}/storybook-static" --container "storybook/qa/${GITHUB_REPOSITORY#*/}"
