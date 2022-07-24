@@ -40,41 +40,24 @@ jobs:
         id: install
         continue-on-error: true
         run: npm install --legacy-peer-deps
-      - name: Install-Retry1
-        continue-on-error: true
-        id: installRetry1
-        if: steps.install.outcome=='failure'
-        run: npm rebuild && npm cache clean --force && npm i --legacy-peer-deps
       - name: Test
         id: test
         continue-on-error: true
         run: |
           git fetch origin main:main
           npm run test
-      - name: Test-Retry1
+  coverage:
+    runs-on: [self-hosted, frontend]
+    steps:
+      - uses: raulanatol/jest-coverage-comment-action@main
         continue-on-error: true
-        id: testRetry1
-        if: steps.test.outcome=='failure'
-        run: npm run test
-      # If you got to this point, we'll do a clean checkout to clear the git cache.
-      # This legitimately has fixed multiple build-time sanity errors.
-      - name: DesperateCheckout
-        if: steps.testRetry1.outcome=='failure'
-        uses: actions/checkout@v2
-        with:
-          clean: true
-          token: ${{secrets.GIT_TOKEN}}
-      - name: Test-Retry2
-        id: testRetry2
-        if: steps.testRetry1.outcome=='failure'
-        run: npm run test
-      - name: Coverage
-        continue-on-error: true
-        id: coverage
-        uses: raulanatol/jest-coverage-comment-action@main
         with:
           github-token: ${{secrets.GIT_TOKEN}}
           jest-command: "npm run test:unit:coverage"
+  storybook:
+    runs-on: [self-hosted, frontend]
+    needs: [test]
+    steps:
       - name: QA-Storybook
         if: ${{ inputs.qaStorybook }}
         continue-on-error: true
