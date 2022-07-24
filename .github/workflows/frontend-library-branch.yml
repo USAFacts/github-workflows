@@ -68,13 +68,13 @@ jobs:
         id: testRetry2
         if: steps.testRetry1.outcome=='failure'
         run: npm run test
-      #- name: Coverage
-      #  continue-on-error: true
-      #  id: coverage
-      #  uses: raulanatol/jest-coverage-comment-action@main
-      #  with:
-      #    github-token: ${{secrets.GIT_TOKEN}}
-      #    jest-command: "npm run test:unit:coverage"
+      - name: Coverage
+        continue-on-error: true
+        id: coverage
+        uses: raulanatol/jest-coverage-comment-action@main
+        with:
+          github-token: ${{secrets.GIT_TOKEN}}
+          jest-command: "npm run test:unit:coverage"
       - name: QA-Storybook
         if: ${{ inputs.qaStorybook }}
         continue-on-error: true
