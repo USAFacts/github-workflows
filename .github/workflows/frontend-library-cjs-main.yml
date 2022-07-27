@@ -61,6 +61,8 @@ jobs:
           registry-url: "https://registry.npmjs.org"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install
+        run: npm install --legacy-peer-deps
       - name: Version
         run: |
           git tag -d $(git tag -l)
@@ -90,8 +92,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
         with:
-          clean: false
+          clean: ${{inputs.cleanCheckout}}
           token: ${{secrets.GIT_TOKEN}}
+      - name: Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+          registry-url: "https://registry.npmjs.org"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Install
+        run: npm install --legacy-peer-deps
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
