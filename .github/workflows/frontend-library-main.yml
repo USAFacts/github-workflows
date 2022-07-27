@@ -43,7 +43,7 @@ jobs:
         id: test
         continue-on-error: true
         run: npm run test
-  version:
+  release:
     runs-on: [self-hosted, frontend]
     needs: [test]
     outputs:
@@ -82,24 +82,6 @@ jobs:
         run: echo "::set-output name=value::$(npm info . version)"
       - name: NPM
         run: npm publish
-  publish-release:
-    runs-on: [self-hosted, frontend]
-    needs: [version]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          clean: ${{inputs.cleanCheckout}}
-          token: ${{secrets.GIT_TOKEN}}
-      - name: Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-          registry-url: "https://registry.npmjs.org"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Install
-        run: npm install --legacy-peer-deps
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
