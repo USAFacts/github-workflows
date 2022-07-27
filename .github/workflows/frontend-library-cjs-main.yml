@@ -84,7 +84,10 @@ jobs:
       - id: version
         run: echo "::set-output name=value::$(npm info . version)"
       - name: NPM
-        run: npm publish
+        run: |
+          cp package.json dist/package.json
+          cd dist
+          npm publish
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
