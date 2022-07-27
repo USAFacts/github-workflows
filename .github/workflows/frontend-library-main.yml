@@ -43,21 +43,6 @@ jobs:
         id: test
         continue-on-error: true
         run: npm run test
-      - name: Version
-        run: |
-          git tag -d $(git tag -l)
-          git fetch --all --prune
-          git config --global user.email "pipeline@usafacts.org"
-          git config --global user.name "Github Pipeline"
-          npm version patch -m "ci(build): Bump package from $(npm info . version) to %s [skip ci]" --force
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: VersionSave
-        id: versionsave
-        run: |
-          git reset --hard
-          git clean -f -d
-          git push --follow-tags --force
   version:
     runs-on: [self-hosted, frontend]
     needs: [test]
@@ -76,22 +61,28 @@ jobs:
           registry-url: "https://registry.npmjs.org"
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Version
+        run: |
+          git tag -d $(git tag -l)
+          git fetch --all --prune
+          git config --global user.email "pipeline@usafacts.org"
+          git config --global user.name "Github Pipeline"
+          npm version patch -m "ci(build): Bump package from $(npm info . version) to %s [skip ci]" --force
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: VersionSave
+        id: versionsave
+        run: |
+          git reset --hard
+          git clean -f -d
+          git push --follow-tags --force
       - id: version
         run: echo "::set-output name=value::$(npm info . version)"
-  npm:
-    runs-on: [self-hosted, frontend]
-    needs: [version]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          clean: ${{inputs.cleanCheckout}}
-          token: ${{secrets.GIT_TOKEN}}
       - name: NPM
         run: npm publish
   publish-release:
     runs-on: [self-hosted, frontend]
-    needs: [npm]
+    needs: [version]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
