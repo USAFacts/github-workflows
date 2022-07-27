@@ -88,8 +88,8 @@ jobs:
           script: |
             await github.rest.repos.createRelease({
               ...context.repo,
-              tag_name: '${{ needs.version.outputs.value }}',
-              name: 'V${{ needs.version.outputs.value }}',
+              tag_name: '${{ steps.version.outputs.value }}',
+              name: 'V${{ steps.version.outputs.value }}',
               generate_release_notes: true
             });
       - name: Storybook
