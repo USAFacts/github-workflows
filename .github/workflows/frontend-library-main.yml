@@ -78,10 +78,10 @@ jobs:
           git reset --hard
           git clean -f -d
           git push --follow-tags --force
-      - id: version
-        run: echo "::set-output name=value::$(npm info . version)"
       - name: NPM
         run: npm publish
+      - id: version
+        run: echo "::set-output name=value::$(npm info . version)"
       - name: Release
         uses: actions/github-script@v5.0.0
         with:
