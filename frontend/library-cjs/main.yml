@@ -5,7 +5,6 @@ on:
   workflow_dispatch:
 jobs:
   release:
-    needs: test
     uses: usafacts/github-workflows/.github/workflows/frontend-library-cjs-main.yml@main
     secrets:
       NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

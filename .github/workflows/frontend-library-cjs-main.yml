@@ -80,13 +80,14 @@ jobs:
         run: |
           git reset --hard
           git clean -f -d
-          git push --follow-tags --force
+          git push --follow-tags --force --no-verify
       - id: version
         run: echo "::set-output name=value::$(npm info . version)"
       - name: NPM
         run: |
           cp package.json dist/package.json
           cd dist
+          rm -rf ./tests ./stories
           npm publish
       - name: Release
         uses: actions/github-script@v5.0.0

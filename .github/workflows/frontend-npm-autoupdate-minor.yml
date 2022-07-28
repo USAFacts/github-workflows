@@ -1,4 +1,4 @@
-name: "Combine PRs"
+name: "Auto-Update"
 on:
   workflow_call:
     secrets:
@@ -38,15 +38,17 @@ jobs:
           git config --global user.name "Github Pipeline"
           npx npm-check-updates /@usafacts/ --target minor -u
           npx npm-check-updates --target patch -u
-          git add package*
-          git commit -m "ci(autoupdate): Auto-update versions [skip ci]"
       - name: Install
         if: ${{ steps.update.outcome != 'failure' }}
-        continue-on-error: true
-        run: npm install --legacy-peer-deps
+        continue-on-error: false
+        run: |
+          rm -f package-lock.json
+          npm install --legacy-peer-deps
+          git add package*
+          git commit -m "ci(autoupdate): Auto-update versions [skip ci]"
       - name: Save
         if: ${{ steps.update.outcome != 'failure' }}
-        continue-on-error: true
+        continue-on-error: false
         run: |
           git reset --hard
           git clean -f -d
